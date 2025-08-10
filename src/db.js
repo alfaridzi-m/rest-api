@@ -1,6 +1,5 @@
 const mysql = require('mysql2/promise');
 
-// Buat connection pool
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -11,5 +10,4 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-// Ekspor pool agar bisa digunakan di file lain
 module.exports = pool;
