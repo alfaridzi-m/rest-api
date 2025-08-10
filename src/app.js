@@ -5,17 +5,16 @@ const pool = require('./db.js');
 const app = express();
 const port = 3000;
 
-// Middleware untuk membaca JSON body
 app.use(express.json());
 
 app.get('/', (req, res) => {
   res.send('Halo dari server!');
 });
 
-// Rute untuk MENGAMBIL SEMUA data
-app.get('/nama_tabel', async (req, res) => {
+//Bagian GET
+app.get('/harga_barang', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM nama_tabel');
+    const [rows] = await pool.query('SELECT * FROM harga_barang');
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -23,11 +22,11 @@ app.get('/nama_tabel', async (req, res) => {
   }
 });
 
-// Rute untuk MENGAMBIL SATU data berdasarkan ID
-app.get('/nama_tabel/:id', async (req, res) => {
+//Bagian GET dengan parameter
+app.get('/harga_barang/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query('SELECT * FROM nama_tabel WHERE id = ?', [id]);
+    const [rows] = await pool.query('SELECT * FROM harga_barang WHERE id = ?', [id]);
 
     if (rows.length === 0) {
       return res.status(404).json({ message: 'Data tidak ditemukan' });
@@ -40,8 +39,8 @@ app.get('/nama_tabel/:id', async (req, res) => {
 });
 
 
-// Rute untuk MEMBUAT data baru (POST)
-app.post('/nama_tabel', async (req, res) => {
+// Bagian POST
+app.post('/harga_barang', async (req, res) => {
   const { name, harga } = req.body;
 
   if (!name || !harga) {
@@ -50,7 +49,7 @@ app.post('/nama_tabel', async (req, res) => {
 
   try {
     const [result] = await pool.query(
-      'INSERT INTO nama_tabel (name, harga) VALUES (?, ?)',
+      'INSERT INTO harga_barang (name, harga) VALUES (?, ?)',
       [name, harga]
     );
 
@@ -67,33 +66,22 @@ app.post('/nama_tabel', async (req, res) => {
   }
 });
 
-// --- PERUBAHAN BARU DIMULAI DI SINI ---
-
-// Rute untuk MEMPERBARUI data berdasarkan ID (PUT)
-app.put('/nama_tabel/:id', async (req, res) => {
+// Bagian PUT
+app.put('/harga_barang/:id', async (req, res) => {
   try {
-    // Ambil ID dari parameter URL
-    const { id } = req.params;
-    // Ambil data baru dari body request
+    const { id } = req.params; 
     const { name, harga } = req.body;
-
-    // Validasi sederhana
     if (!name || !harga) {
       return res.status(400).json({ message: 'Nama dan harga tidak boleh kosong' });
     }
-
-    // Jalankan query UPDATE untuk mengubah data di database
     const [result] = await pool.query(
-      'UPDATE nama_tabel SET name = ?, harga = ? WHERE id = ?',
+      'UPDATE harga_barang SET name = ?, harga = ? WHERE id = ?',
       [name, harga, id]
     );
 
-    // Cek apakah ada baris yang terpengaruh. Jika tidak, berarti ID tidak ditemukan.
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Data tidak ditemukan' });
     }
-
-    // Kirim kembali data yang sudah diperbarui
     res.json({
       id: Number(id),
       name: name,
@@ -105,21 +93,14 @@ app.put('/nama_tabel/:id', async (req, res) => {
   }
 });
 
-// Rute untuk MENGHAPUS data berdasarkan ID (DELETE)
-app.delete('/nama_tabel/:id', async (req, res) => {
+// Bagian DELETE
+app.delete('/harga_barang/:id', async (req, res) => {
   try {
-    // Ambil ID dari parameter URL
     const { id } = req.params;
-
-    // Jalankan query DELETE untuk menghapus data dari database
-    const [result] = await pool.query('DELETE FROM nama_tabel WHERE id = ?', [id]);
-
-    // Cek apakah ada baris yang terpengaruh. Jika tidak, berarti ID tidak ditemukan.
+    const [result] = await pool.query('DELETE FROM harga_barang WHERE id = ?', [id]);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Data tidak ditemukan' });
     }
-
-    // Kirim pesan sukses
     res.json({ message: 'Data berhasil dihapus' });
   } catch (err) {
     console.error(err);
@@ -131,4 +112,3 @@ app.delete('/nama_tabel/:id', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server berjalan di http://localhost:${port}`);
 });
-//testing
